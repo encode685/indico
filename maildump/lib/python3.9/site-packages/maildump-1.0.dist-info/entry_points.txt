@@ -1,0 +1,3 @@
+[console_scripts]
+maildump = maildump_runner.main:main
+

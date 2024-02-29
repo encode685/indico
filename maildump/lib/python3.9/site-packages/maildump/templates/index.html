@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <link rel="shortcut icon" type="image/png" href="../static/images/icon_16x16.png">
+    <title>MailDump</title>
+    <link rel="stylesheet" type="text/css" href="../static/css/maildump.scss">
+    <script type="text/javascript" src="../static/js/maildump.js"></script>
+</head>
+<body class="loading-message-list">
+    <header class="top">
+        <h1>
+            <a href="https://github.com/ThiefMaster/maildump" title="MailDump ({{ version }})">MailDump</a>
+        </h1>
+        <nav class="app">
+            <ul>
+                <li class="search">
+                    <input id="search" type="search" name="search" placeholder="Search messages (only header data)...">
+                </li>
+                <li class="notifications">
+                    <a href="#" title="Toggle WebKit desktop notifications">Enable notifications</a>
+                </li>
+                <li class="clear">
+                    <a href="#" title="Delete all messages">Clear</a>
+                </li>
+                {% if not config.MAILDUMP_NO_QUIT %}
+                    <li class="quit">
+                        <a href="#" title="Terminate MailDump">Quit</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <nav class="messages">
+        <table>
+            <thead>
+                <tr>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Subject</th>
+                    <th>Received</th>
+                </tr>
+            </thead>
+            <tbody id="messages"></tbody>
+        </table>
+    </nav>
+    <div class="resizer" data-sibling="prev"><div class="ruler"></div></div>
+    <article id="message" class="no-message">
+        <header>
+            <dl class="meta" id="message-metadata"></dl>
+            <nav class="views">
+                <ul>
+                    <li class="tab format html" data-message-format="html">
+                        <a href="#">HTML</a>
+                    </li>
+                    <li class="tab selected format plain" data-message-format="plain">
+                        <a href="#">Plain Text</a>
+                    </li>
+                    <li class="tab format source" data-message-format="source">
+                        <a href="#">Source</a>
+                    </li>
+                    <li class="action download">
+                        <a class="button" href="#" target="_blank">
+                            <span>Download</span>
+                        </a>
+                    </li>
+                    <li class="action delete">
+                        <a class="button" href="#">
+                            <span>Delete</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </header>
+        <iframe class="body" id="message-body"></iframe>
+        <aside class="no-message-mark">
+            <div class="no-message">NO MESSAGE SELECTED</div>
+            <div class="loading-message">LOADING MESSAGE...</div>
+        </aside>
+    </article>
+
+    <!-- templates, dialogs, etc. -->
+
+    {% raw %}
+    <script class="template" data-id="message" type="text/x-handlebars-template">
+        <tr data-message-id="{{ id }}">
+            <td>{{ sender }}</td>
+            <td>{{ join recipients.to }}</td>
+            <td>{{ subject }}</td>
+            <td>{{ date created_at }}</td>
+        </tr>
+    </script>
+
+    <script class="template" data-id="message-metadata" type="text/x-handlebars-template">
+        <dt class="created_at">Received</dt>
+        <dd class="created_at">{{ date created_at }}</dd>
+        <dt class="from">From</dt>
+        <dd class="from">{{ sender }}</dd>
+        <dt class="to">To</dt>
+        <dd class="to">{{ join recipients.to }}</dd>
+        {{# if recipients.cc.length }}
+        <dt class="cc">CC</dt>
+        <dd class="cc">{{ join recipients.cc }}</dd>
+        {{/if}}
+        {{# if recipients.bcc.length }}
+        <dt class="bcc">BCC</dt>
+        <dd class="bcc">{{ join recipients.bcc }}</dd>
+        {{/if}}
+        {{# if subject }}
+        <dt class="subject">Subject</dt>
+        <dd class="subject">{{ subject }}</dd>
+        {{/if}}
+        {{# if attachments.length }}
+        <dt class="attachments">Attachments</dt>
+        <dd class="attachments">
+            <ul>
+                {{# each attachments }}
+                <li>
+                    <a href="{{ href }}">{{ filename }}</a>
+                </li>
+                {{/each}}
+            </ul>
+        </dd>
+        {{/if}}
+    </script>
+    {% endraw %}
+
+    <div class="overlay">
+        <div class="modal disconnected">
+            <p>Connection to MailDump lost</p>
+        </div>
+        <div class="modal loading-message-list">
+            <p>Loading initial message list</p>
+        </div>
+    </div>
+</body>
+</html>
